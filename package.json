@@ -3,18 +3,27 @@
   "version": "1.0.0",
   "description": "A free and open source portfolio template, based on VitePress.",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
-    "docs:serve": "vitepress serve docs"
+    "docs:serve": "vitepress serve docs",
+    "test": "node --test",
+    "profile:sync": "node scripts/sync-profile.mjs",
+    "repos:previews": "node scripts/capture-repository-previews.mjs"
   },
   "keywords": [
     "portfolio"
   ],
-  "author": "imStav",
   "license": "ISC",
   "dependencies": {
-    "vitepress": "^1.0.0-alpha.4",
-    "vue": "^3.2.37"
+    "@catppuccin/daisyui": "^2.1.1",
+    "@playwright/test": "~1.63.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "daisyui": "^5.7.42",
+    "tailwindcss": "^4.3.3",
+    "vitepress": "1.6.4",
+    "vue": "^3.5.43",
+    "yaml": "^2.9.1"
   }
 }

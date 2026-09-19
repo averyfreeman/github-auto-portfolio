@@ -1,47 +1,39 @@
-export default {
-    // Meta data
-    lang: 'en-US',
-    title: 'Just my personal portfolio',
-    description: 'Hi I am John Doe, a Full-Stack web developer!',
+import tailwindcss from '@tailwindcss/vite'
+import { defineConfig } from 'vitepress'
+import { loadUserAttributes } from '../user-attributes.data.js'
 
-    themeConfig: {
-        // Tilte displayed on the navbar
-        siteTitle: 'John Doe',
+const attributes = await loadUserAttributes()
+const { site } = attributes
 
-        // Add, remove or change objects on needs
-        nav: [
-            { text: 'Portfolio', link: '/portfolio' },
-            { text: 'About', link: '/about' }
-        ],
-
-        // Add your /modify socials here
-        socialLinks: [
-            { icon: 'github', link: 'https://github.com/' },
-            { icon: 'linkedin', link: 'https://www.linkedin.com/' },
-            { icon: 'twitter', link: 'https://twitter.com/' }
-        ],
-
-        sidebar: [
-            {
-              text: 'Tech',
-              collapsible: true,
-              items: [
-                { text: 'My Portfolio', link: '/portfolio' },
-                { text: 'Skills', link: '/skills' },
-              ]
-            },
-            {
-                text: 'Personal details',
-                collapsible: true,
-                items: [
-                  { text: 'About me', link: '/about' }
-                ]
-              }
-          ],
-
-        // You can delete the footer object if you don't need / want it
-        footer: {
-            message: 'Your message here',
-          }
+export default defineConfig({
+  lang: 'en-US',
+  title: site.title,
+  description: site.description,
+  appearance: false,
+  vite: {
+    plugins: [tailwindcss()]
+  },
+  themeConfig: {
+    siteTitle: site.navbarTitle,
+    nav: site.nav,
+    socialLinks: site.socialLinks,
+    sidebar: [
+      {
+        text: 'Explore',
+        collapsible: true,
+        items: [
+          { text: 'Portfolio', link: '/portfolio' },
+          { text: 'Skills', link: '/skills' }
+        ]
+      },
+      {
+        text: 'About',
+        collapsible: true,
+        items: [{ text: 'About me', link: '/about' }]
+      }
+    ],
+    footer: {
+      message: site.footer
     }
-}
+  }
+})

@@ -1,92 +1,140 @@
-# VitePress portfolio template
+# GitHub-driven portfolio
 
-## Get started
+This project is a developer portfolio built with VitePress, Vue, Tailwind CSS, and daisyUI. It automatically fetches and displays public GitHub repositories, putting a live collection of your work behind a polished, personal portfolio site.
 
-> Get packages
+Its primary use is as a personal portfolio. It is also a useful starting point for developers who want a unified, attractive, low-friction online portfolio without maintaining a separate project catalog by hand.
 
-``` bash
+![Mocha Portfolio page showing the first two pinned repositories and their GitHub README previews](docs/assets/portfolio-page-mocha.png)
+
+## Setup
+
+The required workflow uses only Node.js and npm. Use a current Node.js release with npm installed.
+
+Install the dependencies:
+
+```bash
 npm install
 ```
 
-> Run the dev server
+Configure `docs/user-attributes.yaml` with your GitHub username. This is the complete required configuration:
 
-``` bash
+```yaml
+github:
+  username: your-github-username
+```
+
+Start the development server, build the production site, or preview the production build with these commands:
+
+```bash
 npm run docs:dev
+npm run docs:build
+npm run docs:serve
 ```
 
-*These commands can be found in the `package.json` file @ `"scripts"`*
+`docs:dev` starts the VitePress development server. `docs:build` writes the static site to `docs/.vitepress/dist`, which can be deployed to a static host. Run `docs:serve` after a production build to inspect that output locally.
 
-## The project
+### Generated profile data and local overrides
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="/docs/assets/portfolio-template_dark_preview.png">
-  <img alt="Portfolio preview in light and dark color mode." src="/docs/assets/portfolio-template_light_preview.png">
-</picture>
+At development and build time, the site fetches supported public GitHub profile fields and uses them as generated defaults. If GitHub is unavailable or rate-limits the request, the site falls back to the username, local values, and built-in defaults so the configuration remains usable.
 
-This portfolio template aims to deliver an easy to use, ready-to-go and minimal (but customizable) website for developers. Fully responsive (mobile first!).
+Add authored values to `docs/user-attributes.yaml` when you want to override generated data or customize the site. Local values win, including intentionally empty values, and the development server and production build never write to the YAML file. For example:
 
-It provides a `homepage` with a `navbar`. The homepage has a `hero section` with 2 `call-to-action buttons` (1 leads to the portfolio, the ohter to your Github).
+```yaml
+github:
+  username: your-github-username
+  name: Your Name
+  bio: A short introduction.
 
-The `navbar` handles 2 links as follow:
+profile:
+  role: Product-minded engineer
 
-- **Portfolio**
-
-It leads to the Portfolio page `/docs/portfolio.md` and contains a custom component `Card.vue` made with `Vue 3` and the `Github API`. This API is used to retrive all your **public repositories** directly from your Github profile. To do so, just adapt the username variable to put yours, in `/api/getGitRepos.js` at `let username = 'yourUsername'` (line 3).
-
-``` js
-export async function getRepos() {
-    // Replace with your username to retrieve your repos
-    let username = 'imStav'
-
-    try {
-      const response = await fetch(`https://api.github.com/users/${username}/repos`)
-      const repos = await response.json()
-      return repos
-    } 
-    catch (e) { console.log(e) }
-}
+site:
+  title: Your Name — Portfolio
 ```
 
-- **About**
+Profile synchronization is explicit. Run this command when you want missing supported GitHub fields materialized into `docs/user-attributes.yaml`:
 
-A free section to let you describe yourself. Contains 2 sub-sections **Work experiences** and **Education & Certifications**.
-
-> Of course you can add more links on the navbar, even drop-down menus
-
-📚 Find more information on how to configure / customize the navbar here: [VitePress navigation links documentation](https://vitepress.vuejs.org/guide/theme-nav#navigation-links).
-
-
-At the right of those links, there is a **toggle button** for `dark / light mode`.
-
-
-You can also expose / modify your socials links in the `navbar`. To customize this part, just go to `/docs/.vitepress/config.js` at `socialLinks` wich is an array of objects:
-
-``` js
-// Add / modify your socials here
-socialLinks: [
-    { icon: 'github', link: 'https://github.com/' },
-    { icon: 'linkedin', link: 'https://www.linkedin.com/' },
-    { icon: 'twitter', link: 'https://twitter.com/' }
-]
+```bash
+npm run profile:sync
 ```
-📚 [VitePress social links documentation](https://vitepress.vuejs.org/config/theme-configs#sociallinks).
 
+Synchronization adds missing fields only. It preserves local overrides, empty values, and custom YAML fields; it is not part of `docs:dev` or `docs:build`.
 
-On this template, there is also a `sidebar` (not displayed on the `homepage`). To access and customize data, go to `/docs/.vitepress/config.js` at `sidebar`.
+## Optional repository README previews
 
-📚 [VitePress sidebar documentation](https://vitepress.vuejs.org/guide/theme-sidebar).
+Repository cards can include cached screenshots of each repository's rendered GitHub README. Install the Playwright Chromium browser once, then generate the previews:
 
+```bash
+npx playwright install chromium
+npm run repos:previews
+```
 
-### Technologies
+Images are stored in `docs/public/repository-previews/` and reused on later runs, so the generator does not recapture an existing preview by default. Refresh all cached images with:
 
-- ⚡ VitePress (alpha)
-- 🔭 Vue 3
-- 📝 Markdown
-- :octocat: Github API
+```bash
+npm run repos:previews -- --force
+```
 
+Pinned GitHub repositories are sorted to the top of the portfolio automatically. Preview generation is optional; cards show a fallback message when an image is unavailable.
 
-## Official docs
+## Customization
 
-- [VitePress](https://vitepress.vuejs.org/)
-- [Vue.js 3](https://vuejs.org/)
-- [Github API](https://docs.github.com/en/developers)
+- Homepage copy, profile details, feature cards, portfolio text, status messages, footer text, and site metadata are configured in `docs/user-attributes.yaml`. The defaults live in `docs/user-attributes.data.js`.
+- `docs/about.md` and `docs/skills.md` are regular Markdown pages. Add more `.md` pages under `docs/` when you need long-form content.
+- Top navigation is controlled by `site.nav` in `docs/user-attributes.yaml`; the sidebar structure is defined in `docs/.vitepress/config.js`.
+- The theme selector supports Catppuccin Latte, Frappé, Macchiato, and Mocha. Set the initial theme with `theme.default`; the visitor's later selection is persisted in the browser.
+- GitHub's pinned repositories are promoted in their pinned order. To author a different order locally, add an optional `github.pinnedRepositories` list containing repository names or `owner/name` values.
+
+  ```yaml
+  github:
+    username: your-github-username
+    pinnedRepositories:
+      - owner/first-repository
+      - owner/second-repository
+  ```
+
+- README preview assets are looked up by lower-case owner/name slugs such as `docs/public/repository-previews/owner--repository.png`. Use `npm run repos:previews` to create them rather than editing card markup.
+
+## DaisyUI MCP (optional)
+
+The `daisyui-mcp/` directory is not required to install, develop, build, or deploy the portfolio. It is an optional AI-assisted DaisyUI documentation helper for looking up component guidance during design and development.
+
+If you want to use it, install `uv`, then run it from its directory:
+
+```bash
+cd daisyui-mcp
+uv sync --python 3.12
+uv run daisyui-mcp
+```
+
+The portfolio itself uses the npm `daisyui` package. The Python MCP server is separate design-time tooling.
+
+## FAQ and troubleshooting
+
+### Can I use username-only setup?
+
+Yes. A `github.username` value in `docs/user-attributes.yaml` is enough to run the site. GitHub profile fields and pinned repository ordering are generated when available; everything else comes from local values or defaults.
+
+### How do profile synchronization and overrides interact?
+
+`npm run profile:sync` explicitly fetches the public profile and writes only missing supported GitHub fields. It does not overwrite an existing local value, even when that value is empty, and it never removes custom YAML fields.
+
+### What if GitHub rate-limits requests or profile data is unavailable?
+
+Profile generation falls back to the username, authored values, and built-in defaults. The portfolio page still reports repository API rate limits or unavailable data with a retry action; try again later or provide the copy you want locally.
+
+### Why are repository previews missing?
+
+Install Chromium with `npx playwright install chromium`, then run `npm run repos:previews`. A card displays `README preview unavailable` when its cached asset is missing or could not be loaded.
+
+### How do I refresh cached screenshots?
+
+Run `npm run repos:previews -- --force`. Without `--force`, existing files in `docs/public/repository-previews/` are kept.
+
+### Why did my selected theme persist?
+
+The theme selector stores the choice in browser local storage. Clear this site's storage to reset it to `theme.default`; the default only applies when no saved theme exists.
+
+### Do I need DaisyUI MCP?
+
+No. `daisyui-mcp/` is optional and is not needed for npm installation, local development, builds, or deployment. The portfolio uses the npm `daisyui` package directly.

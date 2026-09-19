@@ -1,9 +1,10 @@
 <script setup>
-import Card from '/components/Card.vue'
+import RepositoryGrid from './components/RepositoryGrid.vue'
+import { data as attributes } from './user-attributes.data.js'
 </script>
 
-# My Portfolio
+<h1>{{ attributes.site.portfolio.title }}</h1>
 
-> These are all my public repositories on Github. Feel free to explore!
+<p>{{ attributes.site.portfolio.intro }}</p>
 
-<Card />
+<RepositoryGrid />

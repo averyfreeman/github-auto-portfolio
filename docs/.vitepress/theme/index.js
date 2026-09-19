@@ -1,4 +1,8 @@
 import DefaultTheme from 'vitepress/theme'
-import './styles/vars.css'
+import Layout from './Layout.vue'
+import './styles/app.css'
 
-export default DefaultTheme
+export default {
+  extends: DefaultTheme,
+  Layout
+}
